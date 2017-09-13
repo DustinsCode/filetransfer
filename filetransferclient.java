@@ -16,4 +16,8 @@ class ftclient{
             System.out.println("Got an exception");
         }
     }
+
+    private static boolean validitycheck(String ip, int port){
+        
+    }
 }
