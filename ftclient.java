@@ -18,6 +18,6 @@ class ftclient{
     }
 
     private static boolean validitycheck(String ip, int port){
-        
+        if(port < 1024 || port > 65535)
     }
 }
