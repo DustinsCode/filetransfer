@@ -36,6 +36,7 @@ class ftserver{
                 ByteBuffer buffer = ByteBuffer.allocate(4096);
                 sc.read(buffer);
                 String fileName = new String(buffer.array());
+		File f = new File(filename);
                 
             }
         }catch(IOException e){
