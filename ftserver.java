@@ -33,6 +33,9 @@ class ftserver{
                 if(sc != null){
                     System.out.println("A client has connected!");
                 }
+                ByteBuffer buffer = ByteBuffer.allocate(4096);
+                sc.read(buffer);
+                String fileName = new String(buffer.array());
                 
             }
         }catch(IOException e){
