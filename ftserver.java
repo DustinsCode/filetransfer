@@ -36,12 +36,41 @@ class ftserver{
                 ByteBuffer buffer = ByteBuffer.allocate(4096);
                 sc.read(buffer);
                 String fileName = new String(buffer.array());
-		File f = new File(filename);
-                
+                if(fileName != null){
+                    try{
+                        InputStream is = ftserver.class.getResourceAsStream(fileName);
+                        buffer = ByteBuffer.wrap(toByteArray(is));
+                        sc.write(buffer);
+                    }catch(NullPointerException npe){
+                        String error = "The file '" + fileName + "' does not exist.";
+                        buffer = ByteBuffer.wrap(error.getBytes());
+                        sc.write(buffer);
+                    }
+                    
+                }
             }
         }catch(IOException e){
             System.out.println("Got an IO exception. Closing program...");
             return;
         }
+    }
+
+    /**
+    * It would be way too convenient for Java
+    * to include this method.
+    *
+    * @param InputStream of the file to send
+    * @return byte[] array of bytes from the inputstream
+    * */
+    public static byte[] toByteArray(InputStream instream) throws IOException{
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        byte[] be = new byte[2048];
+        int offset = 0;
+        while((offset = instream.read(be, 0, be.length)) != -1){
+            os.write(be, 0, offset);
+        }
+        return os.toByteArray();
+
+
     }
 }
