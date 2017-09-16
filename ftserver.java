@@ -38,11 +38,20 @@ class ftserver{
                 String fileName = new String(buffer.array());
                 if(fileName != null){
                     try{
+                        //TODO: keeps throwing nullpointer
+                        //note: make client and try filename= "/testfile.txt"
                         InputStream is = ftserver.class.getResourceAsStream(fileName);
-                        buffer = ByteBuffer.wrap(toByteArray(is));
-                        sc.write(buffer);
+                        try{
+                            buffer = ByteBuffer.wrap(toByteArray(is));
+                            sc.write(buffer);
+                        }catch(IOException ioe){
+                            String error = "There was an error converting the file";
+                            buffer = ByteBuffer.wrap(error.getBytes());
+                            sc.write(buffer);
+                        }
                     }catch(NullPointerException npe){
-                        String error = "The file '" + fileName + "' does not exist.";
+                        //String error = "The file " + fileName + " does not exist.";
+                        String error = "That file doesn't exist, bro.";
                         buffer = ByteBuffer.wrap(error.getBytes());
                         sc.write(buffer);
                     }
