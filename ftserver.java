@@ -33,25 +33,28 @@ class ftserver{
                 if(sc != null){
                     System.out.println("A client has connected!");
                 }
-                ByteBuffer buffer = ByteBuffer.allocate(4096);
+                ByteBuffer buffer = ByteBuffer.allocate(32768);
                 sc.read(buffer);
                 String fileName = new String(buffer.array());
                 if(fileName != null){
                     try{
                         //TODO: keeps throwing nullpointer
                         //note: make client and try filename= "/testfile.txt"
+                        System.out.println("Client trying to recieve " + fileName);
+
                         InputStream is = ftserver.class.getResourceAsStream(fileName);
                         try{
                             buffer = ByteBuffer.wrap(toByteArray(is));
                             sc.write(buffer);
+                            System.out.println("The file has been sent.");
                         }catch(IOException ioe){
                             String error = "There was an error converting the file";
                             buffer = ByteBuffer.wrap(error.getBytes());
                             sc.write(buffer);
                         }
                     }catch(NullPointerException npe){
-                        //String error = "The file " + fileName + " does not exist.";
-                        String error = "That file doesn't exist, bro.";
+                        String error = "The file " + fileName + " does not exist.";
+                        System.out.println("The client's file doesn't exist.");
                         buffer = ByteBuffer.wrap(error.getBytes());
                         sc.write(buffer);
                     }
@@ -78,6 +81,7 @@ class ftserver{
         while((offset = instream.read(be, 0, be.length)) != -1){
             os.write(be, 0, offset);
         }
+        os.flush();
         return os.toByteArray();
 
 
