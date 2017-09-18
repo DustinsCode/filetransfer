@@ -44,7 +44,6 @@ class ftserver{
                 if(fileName != null){
                     try{
                         //TODO: keeps throwing nullpointer
-                        //note: make client and try filename= "/testfile.txt"
                         System.out.println("Client trying to recieve " + fileName);
 
                         InputStream is = ftserver.class.getResourceAsStream(fileName);

@@ -1,6 +1,10 @@
 # Compiled class file
 *.class
 
+#test file
+/clientTest
+*.idea
+
 # Log file
 *.log
 

@@ -59,7 +59,7 @@ class ftclient{
                     System.out.println(message);
                 //incoming file
                 case 2:
-                    incomingFile();
+                    incomingFile(sc,fileName);
                 default:
                     System.out.println("There was an error recieving file");
             }
@@ -96,8 +96,36 @@ class ftclient{
         }
     }
     
-    public static void incomingFile(){
-        InputStream in;
-        FileOutputStream out;
+    /**
+        Accepts incoming file
+        @param
+     */
+    public static void incomingFile(SocketChannel s, String fileName){
+        try {
+            ByteBuffer fileBuff = ByteBuffer.allocate(134217728);
+
+            byte[] byteArray = fileBuff.array();
+            s.read(fileBuff);
+            FileOutputStream fileout = null;
+            try {
+                fileout = new FileOutputStream(fileName);
+            } catch (FileNotFoundException fnfe) {
+                System.out.println("File not found exception");
+            }
+            BufferedOutputStream buffout = new BufferedOutputStream(fileout);
+
+            InputStream is = s.socket().getInputStream();
+            System.out.println("There was an error retrieving file");
+
+            int read = 0;
+
+            while ((read = is.read(byteArray)) != -1) {
+                buffout.write(byteArray, 0, read);
+            }
+            buffout.flush();
+            System.out.println("Success!");
+        }catch(IOException ioe){
+            System.out.println("There was an error retrieving the file");
+        }
     }
 }
