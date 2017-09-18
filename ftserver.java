@@ -41,16 +41,20 @@ class ftserver{
                 ByteBuffer buffer = ByteBuffer.allocate(32768);
                 sc.read(buffer);
                 String fileName = new String(buffer.array());
+                fileName = fileName.trim();
                 if(fileName != null){
                     try{
-                        //TODO: keeps throwing nullpointer
                         System.out.println("Client trying to recieve " + fileName);
 
                         InputStream is = ftserver.class.getResourceAsStream(fileName);
                         try{
+                            buffer = ByteBuffer.wrap(filecode.getBytes());
+                            sc.write(buffer);
+                            
                             buffer = ByteBuffer.wrap(toByteArray(is));
                             sc.write(buffer);
                             System.out.println("The file has been sent.");
+                            
                         }catch(IOException ioe){
                             String error = "There was an error converting the file";
 

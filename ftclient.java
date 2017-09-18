@@ -38,8 +38,7 @@ class ftclient{
             ByteBuffer buff = ByteBuffer.allocate(65535);
             sc.read(buff);
             String code = new String(buff.array());
-
-            //Print code, for testing purposes TODO: delete this later
+            code = code.trim();
             System.out.println(code);
             
             String message;
@@ -56,9 +55,27 @@ class ftclient{
                     System.out.println(message);
                 //incoming file
                 case "2":
-                    incomingFile(sc,fileName);
-                default:
-                    System.out.println("There was an error recieving file");
+                    //incomingFile(sc,fileName);
+                    try {
+                        
+                        ByteBuffer fileBuff = ByteBuffer.allocate(60000000);
+                        
+                        sc.read(fileBuff);
+                        byte[] byteArray = fileBuff.array();
+                        System.out.println("waiting for data..");
+                        
+                        FileOutputStream fileout = null;
+                        File f = new File(fileName.substring(1));
+
+                        FileChannel fc = new FileOutputStream(f, false).getChannel();
+                        fileBuff.flip();
+                        fc.write(fileBuff);
+                        fc.close();
+
+                    }catch(IOException e){
+                        System.out.println("There was an error retrieving the file");
+                    }
+                
             }
             
         }catch(IOException e){
@@ -92,37 +109,5 @@ class ftclient{
             return false;
         }
     }
-    
-    /**
-        Accepts incoming file
-        @param
-     */
-    public static void incomingFile(SocketChannel s, String fileName){
-        try {
-            ByteBuffer fileBuff = ByteBuffer.allocate(134217728);
 
-            byte[] byteArray = fileBuff.array();
-            s.read(fileBuff);
-            FileOutputStream fileout = null;
-            try {
-                fileout = new FileOutputStream(fileName);
-            } catch (FileNotFoundException fnfe) {
-                System.out.println("File not found exception");
-            }
-            BufferedOutputStream buffout = new BufferedOutputStream(fileout);
-
-            InputStream is = s.socket().getInputStream();
-            System.out.println("There was an error retrieving file");
-
-            int read = 0;
-
-            while ((read = is.read(byteArray)) != -1) {
-                buffout.write(byteArray, 0, read);
-            }
-            buffout.flush();
-            System.out.println("Success!");
-        }catch(IOException ioe){
-            System.out.println("There was an error retrieving the file");
-        }
-    }
 }
