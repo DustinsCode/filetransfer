@@ -10,6 +10,11 @@ import java.nio.channels.*;
 *********************************/
 
 class ftserver{
+
+    public final static String errorcode = "0";
+    public final static String messagecode = "1";
+    public final static String filecode = "2";
+
     public static void main(String args[]){
         try{
             ServerSocketChannel c = ServerSocketChannel.open();
@@ -49,12 +54,19 @@ class ftserver{
                             System.out.println("The file has been sent.");
                         }catch(IOException ioe){
                             String error = "There was an error converting the file";
+
+                            //tells client an error message is coming
+                            buffer = ByteBuffer.wrap(errorcode.getBytes());
+                            sc.write(buffer);
+                            //sends message
                             buffer = ByteBuffer.wrap(error.getBytes());
                             sc.write(buffer);
                         }
                     }catch(NullPointerException npe){
                         String error = "The file " + fileName + " does not exist.";
                         System.out.println("The client's file doesn't exist.");
+                        buffer = ByteBuffer.wrap(errorcode.getBytes());
+                        sc.write(buffer);
                         buffer = ByteBuffer.wrap(error.getBytes());
                         sc.write(buffer);
                     }
@@ -82,8 +94,7 @@ class ftserver{
             os.write(be, 0, offset);
         }
         os.flush();
+        os.close();
         return os.toByteArray();
-
-
     }
 }

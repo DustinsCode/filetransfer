@@ -38,8 +38,31 @@ class ftclient{
             ByteBuffer buff = ByteBuffer.allocate(65535);
             sc.read(buff);
             String code = new String(buff.array());
-
-
+            int intcode = -1;
+            try{
+                intcode = Integer.parseInt(code);
+            }catch(NumberFormatException nfe){
+                System.out.println("Error reading code");
+            }
+            
+            String message;
+            switch(intcode){
+                //Incoming error message
+                case 0:
+                    sc.read(buff);
+                    message = new String(buff.array());
+                    System.out.println(message);
+                //Incoming message
+                case 1:
+                    sc.read(buff);
+                    message = new String(buff.array());
+                    System.out.println(message);
+                //incoming file
+                case 2:
+                    incomingFile();
+                default:
+                    System.out.println("There was an error recieving file");
+            }
             
         }catch(IOException e){
             System.out.println("Server Unreachable. Closing program..");
@@ -74,6 +97,7 @@ class ftclient{
     }
     
     public static void incomingFile(){
-
+        InputStream in;
+        FileOutputStream out;
     }
 }
