@@ -22,7 +22,7 @@ class ftclient{
                 if(port < 1024 || port > 65535){
                     throw new NumberFormatException();
                 }
-                sc.bind(new InetSocketAddress(port));
+                //sc.connect(new InetSocketAddress(port));
             }catch(NumberFormatException nfe){
                 System.out.println("Port must be a valid integer between 1024 and 65535. Closing program...");
                 return;
@@ -38,27 +38,24 @@ class ftclient{
             ByteBuffer buff = ByteBuffer.allocate(65535);
             sc.read(buff);
             String code = new String(buff.array());
-            int intcode = -1;
-            try{
-                intcode = Integer.parseInt(code);
-            }catch(NumberFormatException nfe){
-                System.out.println("Error reading code");
-            }
+
+            //Print code, for testing purposes TODO: delete this later
+            System.out.println(code);
             
             String message;
-            switch(intcode){
+            switch(code){
                 //Incoming error message
-                case 0:
+                case "0":
                     sc.read(buff);
                     message = new String(buff.array());
                     System.out.println(message);
                 //Incoming message
-                case 1:
+                case "1":
                     sc.read(buff);
                     message = new String(buff.array());
                     System.out.println(message);
                 //incoming file
-                case 2:
+                case "2":
                     incomingFile(sc,fileName);
                 default:
                     System.out.println("There was an error recieving file");
