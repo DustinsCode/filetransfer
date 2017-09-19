@@ -72,6 +72,8 @@ class ftclient{
                         fc.write(fileBuff);
                         fc.close();
 
+                        System.out.println("Success!");
+
                     }catch(IOException e){
                         System.out.println("There was an error retrieving the file");
                     }
