@@ -2,6 +2,8 @@ import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
+import java.nio.file.Path.*;
+import java.nio.file.*;
 
 /*********************************
 * TCP File Transfer Project
@@ -45,13 +47,28 @@ class ftserver{
                 if(fileName != null){
                     try{
                         System.out.println("Client trying to recieve " + fileName);
-
-                        InputStream is = ftserver.class.getResourceAsStream(fileName);
+                        
+                        
+                        //InputStream is = ftserver.class.getResourceAsStream(fileName);
                         try{
+
+                        //testing
+                        Path filelocation = null;
+                        try{
+                            filelocation = Paths.get(ftserver.class.getResource(fileName).toURI());
+                        }catch(URISyntaxException u){
+                            //bullshit
+                        }
+                        byte[] data = Files.readAllBytes(filelocation);
+
+                        //testing
+
+
                             buffer = ByteBuffer.wrap(filecode.getBytes());
                             sc.write(buffer);
                             
-                            buffer = ByteBuffer.wrap(toByteArray(is));
+                            buffer = ByteBuffer.wrap(data);
+                            //buffer = ByteBuffer.wrap(toByteArray(is));
                             sc.write(buffer);
                             System.out.println("The file has been sent.");
                             

@@ -39,7 +39,7 @@ class ftclient{
             sc.read(buff);
             String code = new String(buff.array());
             code = code.trim();
-            System.out.println(code);
+            
             
             String message;
             switch(code){
@@ -59,8 +59,8 @@ class ftclient{
                     try {
                         
                         ByteBuffer fileBuff = ByteBuffer.allocate(60000000);
-                        
                         sc.read(fileBuff);
+                        
                         byte[] byteArray = fileBuff.array();
                         System.out.println("waiting for data..");
                         
@@ -100,8 +100,6 @@ class ftclient{
                 ipintarray[i] = Integer.parseInt(iparray[i]);
             }
             if(ipintarray.length != 4){
-                System.out.println("" + ipintarray.length);
-                System.out.println("" + iparray.length);
                 throw new NumberFormatException();
             }else{
                 return true;
