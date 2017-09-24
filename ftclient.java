@@ -30,10 +30,12 @@ class ftclient{
             sc.connect(new InetSocketAddress(ip,port));
 
             while(true){
-                //read command from user
-                String fileName = cons.readLine("Enter command or file to send: ");
-                fileName = fileName.trim();
-
+                //read command from user and make sure they actually enter something
+                String fileName = "";
+                while(fileName.equals("")){
+                    fileName = cons.readLine("Enter command or file to send: ");
+                    fileName = fileName.trim();
+                }
                 String message;
                 ByteBuffer buff = ByteBuffer.allocate(65535);
                 ByteBuffer buffer;
@@ -58,9 +60,10 @@ class ftclient{
                         return;
                     //incoming file
                     default:
-                        //if(fileName.charAt(0) != "/"){
-
-                        //}
+                        if(fileName.charAt(0) != '/'){
+                            System.out.println("File name must start with '/'. Type help for more info");
+                            break;
+                        }
                         //create new buffer and allocate space for return code
                         buffer = ByteBuffer.wrap(fileName.getBytes());
                         sc.write(buffer);

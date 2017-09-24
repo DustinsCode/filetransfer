@@ -58,7 +58,6 @@ class serverThread extends Thread{
                     sc.read(buffer);
                     String fileName = new String(buffer.array());
                     fileName = fileName.trim();
-                    System.out.println(fileName);
 
                     //exit, ls, and file request commands
                     if(fileName.equals("exit")){
@@ -66,27 +65,22 @@ class serverThread extends Thread{
                         sc.close();
                         return;
 
-                        //Tell client which files are available
+                    //Tell client which files are available
                     }else if(fileName.equals("ls")){
                         File flocation = new File(ftserver.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-                        //File flocation = new File("/ftserver.class");
                         File[] files = flocation.listFiles();
                         String fileList="";
                         for(File f: files){
-                            //System.out.println(f.getName());
                             fileList += (f.getName() + "\n");
                         }
-                        System.out.println(fileList);
                         buffer = ByteBuffer.wrap(fileList.getBytes());
                         sc.write(buffer);
 
                     }else if(fileName != null){
-                   // if(fileName != null && fileName.charAt(0) == '/'){
                         try{
                             System.out.println("Client trying to recieve " + fileName);
 
                             try{
-
                                 Path filelocation = null;
                                 String l = null;
                                 try{
@@ -142,14 +136,14 @@ class serverThread extends Thread{
                         }catch(NullPointerException npe){
                             String error = "filenotfound";
                             System.out.println("The client's file doesn't exist.");
-
                             buffer = ByteBuffer.wrap(error.getBytes());
                             sc.write(buffer);
                         }
                     }
             }catch(IOException e){
-                //System.out.println("Got an IO Exception. Disconnecting client..");
-                //return;
+                System.out.println("Client figured out how to use ctrl+c. " +
+                "I guess I'll take care of it and close their connection the nice way.");
+                return;
             }
         }
     }
