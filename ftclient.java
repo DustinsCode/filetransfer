@@ -29,7 +29,7 @@ class ftclient{
             //connect to server
             sc.connect(new InetSocketAddress(ip,port));
 
-            //while(true){
+            while(true){
                 //read command from user
                 String fileName = cons.readLine("Enter command or file to send: ");
                 fileName = fileName.trim();
@@ -50,8 +50,15 @@ class ftclient{
                         sc.read(buff);
                         message = new String(buff.array());
                         System.out.println(message);
+                    case "exit":
+                        buffer = ByteBuffer.wrap(fileName.getBytes());
+                        sc.write(buffer);
+                        return;
                     //incoming file
                     default:
+                        //if(fileName.charAt(0) != "/"){
+
+                        //}
                         //create new buffer and allocate space for return code
                         buffer = ByteBuffer.wrap(fileName.getBytes());
                         sc.write(buffer);
@@ -107,7 +114,7 @@ class ftclient{
                             }
                         }
                 }
-            //}
+            }
         }catch(IOException e){
             System.out.println("Server Unreachable. Closing program..");
             return;
