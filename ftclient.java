@@ -29,20 +29,23 @@ class ftclient{
             //connect to server
             sc.connect(new InetSocketAddress(ip,port));
 
-            //while(true){
-                //read command from user
-                String fileName = cons.readLine("Enter command or file to send: ");
-                fileName = fileName.trim();
-                
+            while(true){
+                //read command from user and make sure they actually enter something
+                String fileName = "";
+                while(fileName.equals("")){
+                    fileName = cons.readLine("Enter command or file to send: ");
+                    fileName = fileName.trim();
+                }
                 String message;
                 ByteBuffer buff = ByteBuffer.allocate(65535);
                 ByteBuffer buffer;
                 switch(fileName){
                     //Lists commands
                     case "help":
-                        System.out.println("exit - close the program \n" + 
-                                            "ls - list available files to transfer \n" + 
+                        System.out.println("exit - close the program \n" +
+                                            "ls - list available files to transfer \n" +
                                             "/{filename} - without brackets to request a file");
+                        break;
                     //Incoming list of files
                     case "ls":
                         buffer = ByteBuffer.wrap(fileName.getBytes());
@@ -50,8 +53,17 @@ class ftclient{
                         sc.read(buff);
                         message = new String(buff.array());
                         System.out.println(message);
+                        break;
+                    case "exit":
+                        buffer = ByteBuffer.wrap(fileName.getBytes());
+                        sc.write(buffer);
+                        return;
                     //incoming file
                     default:
+                        if(fileName.charAt(0) != '/'){
+                            System.out.println("File name must start with '/'. Type help for more info");
+                            break;
+                        }
                         //create new buffer and allocate space for return code
                         buffer = ByteBuffer.wrap(fileName.getBytes());
                         sc.write(buffer);
@@ -70,7 +82,7 @@ class ftclient{
                                     String sendIt = "sendit";
                                     buffer = ByteBuffer.wrap(sendIt.getBytes());
                                     sc.write(buffer);
-                                    
+
                                     ByteBuffer fileBuff = ByteBuffer.allocate(4096);
                                     buffer = ByteBuffer.allocate(4096);
                                     sc.read(buffer);
@@ -107,16 +119,16 @@ class ftclient{
                             }
                         }
                 }
-            //}
+            }
         }catch(IOException e){
             System.out.println("Server Unreachable. Closing program..");
             return;
         }
     }
-    
+
     /****
     * Checks validity of user given IP address
-    * 
+    *
     * @param ip user typed IP address
     * @return true if valid, false if not
     ****/
