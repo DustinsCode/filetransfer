@@ -22,70 +22,98 @@ class ftclient{
                 if(port < 1024 || port > 65535){
                     throw new NumberFormatException();
                 }
-                //sc.connect(new InetSocketAddress(port));
             }catch(NumberFormatException nfe){
                 System.out.println("Port must be a valid integer between 1024 and 65535. Closing program...");
                 return;
             }
-            
-            //Connect to server
+            //connect to server
             sc.connect(new InetSocketAddress(ip,port));
-            String fileName = cons.readLine("Enter the name of requested file: ");
-            ByteBuffer buffer = ByteBuffer.wrap(fileName.getBytes());
-            sc.write(buffer);
 
-            //create new buffer and allocate space for return code
-            ByteBuffer buff = ByteBuffer.allocate(65535);
-            sc.read(buff);
-            String code = new String(buff.array());
-            code = code.trim();
-            
-            
-            String message;
-            switch(code){
-                //Incoming error message
-                case "0":
-                    sc.read(buff);
-                    message = new String(buff.array());
-                    System.out.println(message);
-                //Incoming message
-                case "1":
-                    sc.read(buff);
-                    message = new String(buff.array());
-                    System.out.println(message);
-                //incoming file
-                case "2":
-                    //incomingFile(sc,fileName);
-                    try {
-                        
-                        ByteBuffer fileBuff = ByteBuffer.allocate(60000000);
-                        sc.read(fileBuff);
-                        
-                        byte[] byteArray = fileBuff.array();
-                        System.out.println("waiting for data..");
-                        
-                        FileOutputStream fileout = null;
-                        File f = new File(fileName.substring(1));
-
-                        FileChannel fc = new FileOutputStream(f, false).getChannel();
-                        fileBuff.flip();
-                        fc.write(fileBuff);
-                        fc.close();
-
-                        System.out.println("Success!");
-
-                    }catch(IOException e){
-                        System.out.println("There was an error retrieving the file");
-                    }
+            //while(true){
+                //read command from user
+                String fileName = cons.readLine("Enter command or file to send: ");
+                fileName = fileName.trim();
                 
-            }
-            
+                String message;
+                ByteBuffer buff = ByteBuffer.allocate(65535);
+                ByteBuffer buffer;
+                switch(fileName){
+                    //Lists commands
+                    case "help":
+                        System.out.println("exit - close the program \n" + 
+                                            "ls - list available files to transfer \n" + 
+                                            "/{filename} - without brackets to request a file");
+                    //Incoming list of files
+                    case "ls":
+                        buffer = ByteBuffer.wrap(fileName.getBytes());
+                        sc.write(buffer);
+                        sc.read(buff);
+                        message = new String(buff.array());
+                        System.out.println(message);
+                    //incoming file
+                    default:
+                        //create new buffer and allocate space for return code
+                        buffer = ByteBuffer.wrap(fileName.getBytes());
+                        sc.write(buffer);
+
+                        sc.read(buff);
+                        String code = new String(buff.array());
+                        code = code.trim();
+                        if(code.equals("error")){
+                            System.out.println("There was an error retrieving the file");
+                        }else if(code.equals("filenotfound")){
+                            System.out.println("The file was not found.");
+                        }else{
+                            try {
+                                try {
+                                    //tell server we are ready to recieve the size of file
+                                    String sendIt = "sendit";
+                                    buffer = ByteBuffer.wrap(sendIt.getBytes());
+                                    sc.write(buffer);
+                                    
+                                    ByteBuffer fileBuff = ByteBuffer.allocate(4096);
+                                    buffer = ByteBuffer.allocate(4096);
+                                    sc.read(buffer);
+                                    String sizeString = new String(buffer.array());
+                                    sizeString = sizeString.trim();
+                                    System.out.println(sizeString);
+                                    long fileSize = Long.valueOf(sizeString).longValue();
+
+                                    //tell server ready to recieve file
+                                    buffer = ByteBuffer.wrap(sendIt.getBytes());
+                                    sc.write(buffer);
+
+                                    System.out.println("waiting for data..");
+
+                                    File f = new File(fileName.substring(1));
+                                    fileBuff = ByteBuffer.allocate(4096);
+                                    int inBytes = 0;
+                                    FileChannel fc = new FileOutputStream(f, false).getChannel();
+
+                                    while (inBytes != fileSize) {
+                                        inBytes += sc.read(fileBuff);
+                                        fileBuff.flip();
+                                        fc.write(fileBuff);
+                                        fileBuff = ByteBuffer.allocate(4096);
+                                    }
+                                    fc.close();
+                                    System.out.println("Success!");
+
+                                }catch(NumberFormatException nfe){
+                                    System.out.println("Error");
+                                }
+                            }catch(IOException e){
+                                System.out.println("There was an error retrieving the file");
+                            }
+                        }
+                }
+            //}
         }catch(IOException e){
             System.out.println("Server Unreachable. Closing program..");
             return;
         }
     }
-
+    
     /****
     * Checks validity of user given IP address
     * 
