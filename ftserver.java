@@ -65,12 +65,26 @@ class serverThread extends Thread{
                         System.out.println("Client disconnected");
                         sc.close();
                         return;
+
+                        //Tell client which files are available
                     }else if(fileName.equals("ls")){
-                        
-                    }else{
+                        File flocation = new File(ftserver.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+                        //File flocation = new File("/ftserver.class");
+                        File[] files = flocation.listFiles();
+                        String fileList="";
+                        for(File f: files){
+                            //System.out.println(f.getName());
+                            fileList += (f.getName() + "\n");
+                        }
+                        System.out.println(fileList);
+                        buffer = ByteBuffer.wrap(fileList.getBytes());
+                        sc.write(buffer);
+
+                    }else if(fileName != null){
+                   // if(fileName != null && fileName.charAt(0) == '/'){
                         try{
                             System.out.println("Client trying to recieve " + fileName);
-                            
+
                             try{
 
                                 Path filelocation = null;
@@ -78,11 +92,11 @@ class serverThread extends Thread{
                                 try{
                                     filelocation = Paths.get(ftserver.class.getResource(fileName).toURI());
                                     File f = new File(filelocation.toString());
-                                    
+
                                     String incoming = "incoming";
                                     buffer = ByteBuffer.wrap(incoming.getBytes());
                                     sc.write(buffer);
-                                    
+
                                     //wait until client sends ready to recieve message
                                     buffer = ByteBuffer.allocate(4096);
                                     sc.read(buffer);
@@ -117,7 +131,6 @@ class serverThread extends Thread{
                                 }catch(URISyntaxException u){
                                     System.out.println("Error converting file");
                                 }
-                                
                                 System.out.println("The file has been sent.");
                             }catch(IOException ioe){
                                 String error = "error";
@@ -125,19 +138,18 @@ class serverThread extends Thread{
                                 //tells client an error occurred
                                 buffer = ByteBuffer.wrap(error.getBytes());
                                 sc.write(buffer);
-                                
                             }
                         }catch(NullPointerException npe){
                             String error = "filenotfound";
                             System.out.println("The client's file doesn't exist.");
-                            
+
                             buffer = ByteBuffer.wrap(error.getBytes());
                             sc.write(buffer);
                         }
                     }
-                
             }catch(IOException e){
-                System.out.println("Got an IO Exception");
+                //System.out.println("Got an IO Exception. Disconnecting client..");
+                //return;
             }
         }
     }
