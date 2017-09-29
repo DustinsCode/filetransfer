@@ -1,3 +1,3 @@
 # README #
 
-This is a private repository for my project.  No one should be allowed to see this except for me. 
+This is a file transfer client and server written in Java using TCP sockets using a stop and wait method.
